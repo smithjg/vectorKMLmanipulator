@@ -43,9 +43,10 @@ namespace DisplayBixlerPath
             return i;
         }
 
+        /// 
         public string GivenHandleFindComponent(byte componentHandle)
-        {
-            return _components[componentHandle];
+        {// check the array bounds of course 
+            return (componentHandle<=_components.Length)?_components[componentHandle]:String.Empty;
         }
     }
 

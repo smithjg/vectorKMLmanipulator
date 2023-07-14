@@ -51,6 +51,8 @@ namespace DisplayBixlerPath
             return true;
         }
 
+
+        /// Function extracts just the coordinates from each reading point in the file
         public List<CoordinateTriple> ExtractKMLCoordinates()
         {
             List < CoordinateTriple > _listCoordTriple = new List<CoordinateTriple> ();

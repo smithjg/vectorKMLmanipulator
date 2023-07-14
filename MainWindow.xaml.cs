@@ -22,10 +22,11 @@ namespace DisplayBixlerPath
     /// </summary>
     public partial class MainWindow : Window
     {
-        FDRFileParse _fDRFileParse;
+        FDRFileParse? _fDRFileParse;
+        string? _fileName;
 
         public MainWindow()
-        {
+        {            
             InitializeComponent();
         }
 
@@ -35,18 +36,30 @@ namespace DisplayBixlerPath
             openFileDialog.Filter = "Vector files (*.FDR)|*.FDR";
             if (openFileDialog.ShowDialog() == true)
             {
-                var lines = File.ReadAllLines(openFileDialog.FileName);
+                _fileName = openFileDialog.FileName;
+                var lines = File.ReadAllLines(_fileName);
                 _fDRFileParse = new FDRFileParse(lines);
+            }
+            else
+            {/// jgs shorty - fix 
+                 _fileName = String.Empty;
             }
         }
 
         private void btnExtractRoute_Click(object sender, RoutedEventArgs e)
         {
-            _fDRFileParse.ExtractKMLCoordinates();
+            if(null!=_fDRFileParse)
+            { 
+                string outFile = @"C:\Projects\KMLProject\MyTest.txt";
+                List < CoordinateTriple > coordinateTripleList = _fDRFileParse.ExtractKMLCoordinates();
 
+                string kmlPath = new KMLPath(coordinateTripleList).GetPath();
+            
+                if (!File.Exists(outFile))
+                {
+                    File.WriteAllText(outFile, kmlPath, Encoding.UTF8);
+                }
+            }
         }
-
-        
-
     }
 }
