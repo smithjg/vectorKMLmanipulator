@@ -14,13 +14,14 @@ namespace DisplayBixlerPath
     {
         List<ReadingPoint> ReadingPointList = new List<ReadingPoint>();
         List<SessionIdentifier> SessionIdentifierList = new List<SessionIdentifier>();
-        ReadingPointHeader? readingPointHeader;
+        ReadingPointHeader? readingPointHeader;// in reality JGS we should not make this alowable to null
 
         public FDRFileParse(string[] lines)
         {
             readActionOnFDRFile(lines);
         }
 
+        /// need to account for the first two lines JGS 
         private void readActionOnFDRFile(string[] lines)
         {
             for (var i = 0; i < (lines.Length); i++)
@@ -53,13 +54,29 @@ namespace DisplayBixlerPath
 
 
         /// Function extracts just the coordinates from each reading point in the file
-        public List<CoordinateTriple> ExtractKMLCoordinates()
+        public List<CoordinateTriple> ExtractKMLPathGivenSession()
         {
             List < CoordinateTriple > _listCoordTriple = new List<CoordinateTriple> ();
 
-            foreach (ReadingPoint readingPoint in ReadingPointList)// this does not work 
+            foreach (ReadingPoint var in ReadingPointList)
             {
-                CoordinateTriple cordTripple = new CoordinateTriple(readingPoint);
+                /// while switch is on  
+
+                CoordinateTriple cordTripple = new CoordinateTriple(var,26,25,27);
+                _listCoordTriple.Add(cordTripple);
+            }
+
+            return _listCoordTriple;
+        }
+
+         /// Function extracts just the coordinates from each reading point in the file
+        public List<CoordinateTriple> ExtractAllKMLPath()
+        {
+            List < CoordinateTriple > _listCoordTriple = new List<CoordinateTriple> ();
+
+            foreach (ReadingPoint var in ReadingPointList)
+            {
+                CoordinateTriple cordTripple = new CoordinateTriple(var,26,25,27);
                 _listCoordTriple.Add(cordTripple);
             }
 

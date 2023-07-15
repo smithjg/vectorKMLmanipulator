@@ -9,37 +9,19 @@ namespace DisplayBixlerPath
 {
     public  class CoordinateTriple
     {
-        //string? _longitude;
-        //string? _latitude;
-        //string? _altitude;
-        ReadingPoint? _readingPoint; //instead of making the stings we keep a reference to them 
-
+        string? _LatLonAltstring;
+        
         /// <summary>
-        /// Should we need a tripple created from raw data 
+        /// this is where we divorce from the concept of a reading point and map to the concept of kml
         /// </summary>
-        /// <param name="longitude"></param>
-        /// <param name="latitude"></param>
-        /// <param name="altitude"></param>
-        //CoordinateTriple(string longitude, string latitude, string altitude)
-        //{// we are coping the reference I believe 
-        //    _longitude = longitude;
-        //    _latitude = latitude;
-        //    _altitude = altitude;
-        //    _readingPoint = null;
-        //}
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="readingPoint"></param>
-        public CoordinateTriple(ReadingPoint readingPoint)
-        {// we are copying the reference I believe 
-            _readingPoint = readingPoint;
+        public CoordinateTriple(ReadingPoint readingPoint,byte lat,byte lon,byte alt)
+        {
+            _LatLonAltstring = readingPoint.GivenHandleFindComponent(lat) + ','+ readingPoint.GivenHandleFindComponent(lon) + ','+ readingPoint.GivenHandleFindComponent(alt);
         }
 
-        public string CoordinateTripleAsKMLCoord(byte lat, byte lon,byte alt)
-        {
-            return (_readingPoint==null)?" ":_readingPoint.GivenHandleFindComponent(lat) + ','+ _readingPoint.GivenHandleFindComponent(lon) + ','+ _readingPoint.GivenHandleFindComponent(alt);
+        public string CoordinateTripleAsKMLCoord()
+        {   // check for null before returning the coordinate sting in kml format 
+            return (_LatLonAltstring==null)?" ":_LatLonAltstring;
         }
     }
 }

@@ -30,6 +30,8 @@ namespace DisplayBixlerPath
             InitializeComponent();
         }
 
+
+        /// Button handler for selection of the data file
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -46,19 +48,20 @@ namespace DisplayBixlerPath
             }
         }
 
+        /// Button handler for the extraction and writing of the actual route 
         private void btnExtractRoute_Click(object sender, RoutedEventArgs e)
         {
             if(null!=_fDRFileParse)
             { 
-                string outFile = @"C:\Projects\KMLProject\MyTest.txt";
-                List < CoordinateTriple > coordinateTripleList = _fDRFileParse.ExtractKMLCoordinates();
+                string outFile = @"C:\Projects\KMLProject\MyTest.kml";
+                List < CoordinateTriple > coordinateTripleList = _fDRFileParse.ExtractAllKMLPath();
 
                 string kmlPath = new KMLPath(coordinateTripleList).GetPath();
-            
-                if (!File.Exists(outFile))
+
+                using (StreamWriter writer = new StreamWriter(outFile))
                 {
-                    File.WriteAllText(outFile, kmlPath, Encoding.UTF8);
-                }
+                   writer.WriteLine(kmlPath);
+                }            
             }
         }
     }

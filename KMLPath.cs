@@ -40,21 +40,23 @@ namespace DisplayBixlerPath
                                 <coordinates> ";
   
         string pathend = @"        </coordinates>      </LineString>    </Placemark>  </Document></kml> ";
-        StringBuilder sb;
+        StringBuilder kmlPathdefinition;
 
+        /// Given a set of coordinates create a KML format Path 
         public KMLPath( List < CoordinateTriple > coordTripleList)
         {
-            sb = new StringBuilder(pathPreamble);
+            kmlPathdefinition = new StringBuilder(pathPreamble);
             foreach(var coordTriple in coordTripleList)
             {
-                sb.AppendLine(coordTriple.CoordinateTripleAsKMLCoord(25,26,27));
+                kmlPathdefinition.AppendLine(coordTriple.CoordinateTripleAsKMLCoord());// of course dereive from header jgs 
             }
-            sb.AppendLine(pathend);
+            kmlPathdefinition.AppendLine(pathend);
         }
 
+        /// Write the path out to a file
         public string GetPath()
         {
-            return sb.ToString();
+            return kmlPathdefinition.ToString();
         }
 
     }
