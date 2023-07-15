@@ -57,7 +57,7 @@ namespace DisplayBixlerPath
         {
             List < CoordinateTriple > _listCoordTriple = new List<CoordinateTriple> ();
 
-            foreach (ReadingPoint readingPoint in ReadingPointList)
+            foreach (ReadingPoint readingPoint in ReadingPointList)// this does not work 
             {
                 CoordinateTriple cordTripple = new CoordinateTriple(readingPoint);
                 _listCoordTriple.Add(cordTripple);
