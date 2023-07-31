@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace DisplayBixlerPath
 {
@@ -13,7 +14,7 @@ namespace DisplayBixlerPath
     public class FDRFileParse
     {
         List<ReadingPoint> ReadingPointList = new List<ReadingPoint>();
-        List<SessionIdentifier> SessionIdentifierList = new List<SessionIdentifier>();
+        List<SessionIdentifier> _SessionIdentifierList = new List<SessionIdentifier>();
         ReadingPointHeader? readingPointHeader;// in reality JGS we should not make this alowable to null
 
         public FDRFileParse(string[] lines)
@@ -21,16 +22,31 @@ namespace DisplayBixlerPath
             readActionOnFDRFile(lines);
         }
 
+        public List<SessionIdentifier> SessionIdentifierList
+        {   
+            get => _SessionIdentifierList;
+        }
+
+        public ObservableCollection<string> SessionNames()
+        {   
+            ObservableCollection<string> s= new ObservableCollection<string>();
+            foreach (SessionIdentifier sessionIdentifier in _SessionIdentifierList )
+            {
+                s.Add(sessionIdentifier.SessionName);
+            }
+            return s;
+        }
+
         /// need to account for the first two lines JGS 
         private void readActionOnFDRFile(string[] lines)
         {
-            for (var i = 0; i < (lines.Length); i++)
+            for (var i = 2; i < (lines.Length); i++)
             {
                 if (lines[i].Contains("Session"))
                 {   // the lines starting with session are a part of a pair
                     // where the second line is the start and stop index 
                     // And the first line is the name of the session 
-                    SessionIdentifierList.Add(new SessionIdentifier(lines[i], lines[i + 1]));
+                    _SessionIdentifierList.Add(new SessionIdentifier(lines[i], lines[i + 1]));
                     i++; // we have read a second line so increment the counter to account for that 
                 }
                 else if (lines[i].StartsWith("Milliseconds"))
@@ -62,7 +78,7 @@ namespace DisplayBixlerPath
             {
                 /// while switch is on  
 
-                CoordinateTriple cordTripple = new CoordinateTriple(var,26,25,27);
+                CoordinateTriple cordTripple = new CoordinateTriple(var,26,25,27);// jgs magic numbers 
                 _listCoordTriple.Add(cordTripple);
             }
 

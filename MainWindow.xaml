@@ -13,7 +13,11 @@
             <Button Margin="10" Name="btnOpenFile" Click="btnOpenFile_Click">Open file</Button>
             <Separator Width="20" Background="Transparent"/>
             <Button Margin="10" Name="btnExtractRoute" Click="btnExtractRoute_Click">Extract Route</Button>
-        </WrapPanel>
+            <Separator Width="20" Background="Transparent"/>
+              <ComboBox Name="cmbSessions" SelectionChanged="cmbSessions_SelectionChanged" ItemsSource="{Binding _names}">
+            
+              </ComboBox>
+            </WrapPanel>
             <TextBox Name="txtEditor" />
         </DockPanel>
 
