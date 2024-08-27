@@ -34,6 +34,8 @@ namespace DisplayBixlerPath
         string? _selectedSession;
         public ObservableCollection<string>? _names { get; set; }
 
+        UInt16 _CurrentlySelectedSession = 0;
+
         public MainWindow()
         { 
     	    InitializeComponent();
@@ -43,34 +45,42 @@ namespace DisplayBixlerPath
         /// Button handler for selection of the data file
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
+            btnExtractRoute.IsEnabled = false;// each new pushing of this button disables the output button 
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Vector files (*.FDR)|*.FDR";
-            if (openFileDialog.ShowDialog() == true)
+            try
             {
-                _fileName = openFileDialog.FileName;
-                var lines = File.ReadAllLines(_fileName);
-                _fDRFileParse = new FDRFileParse(lines);
-                _names = _fDRFileParse.SessionNames();
-                OnPropertyChanged("_names"); // notify the system that the _names collection has updated and then the binding to the view model will update the screen
-                _fileNameOut = createOutputFileName(_fileName);
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    _fileName = openFileDialog.FileName;
+                    var lines = File.ReadAllLines(_fileName);
+                    _fDRFileParse = new FDRFileParse(lines);
+                    _names = _fDRFileParse.SessionNames();
+                    _fileNameOut = createOutputFileName(_fileName, _names[0]);
+                    cmbSessions.SelectedValue = _names[0];
+                    btnExtractRoute.IsEnabled = true;
+                    OnPropertyChanged("_names"); // notify the system that the _names collection has updated and then the binding to the view model will update the screen
+                }
+                else
+                {
+                    MessageBox.Show("something went wrong");
+                }
             }
-            else
-            {/// jgs shorty - fix 
-                 _fileName = String.Empty;
-                _fileNameOut = String.Empty;
-                _names = new ObservableCollection<string>(new List <string>());
+            catch (Exception ex)
+            { 
+                MessageBox.Show(ex.Message);
             }
-
         }
 
         /// Button handler for the extraction and writing of the actual route 
         private void btnExtractRoute_Click(object sender, RoutedEventArgs e)
         {
             _names = new ObservableCollection<string>(new List<string>());
+            _fileNameOut = createOutputFileName(_fileName, _selectedSession);
             OnPropertyChanged();// not actually essential as the buton push is not updating any state in the model view connected to the view model 
             if(null!=_fDRFileParse)
             {
-                List<CoordinateTriple> coordinateTripleList = _fDRFileParse.ExtractAllKMLPath();
+                List<CoordinateTriple> coordinateTripleList = _fDRFileParse.ExtractKMLPathGivenSession(_CurrentlySelectedSession);
 
                 string kmlPath = new KMLPath(coordinateTripleList).GetPath();
                 if (_fileNameOut != null && _fileNameOut != String.Empty)
@@ -88,9 +98,14 @@ namespace DisplayBixlerPath
             }
         }
 
-        private string createOutputFileName(string outputFileName)
+        // Slightly complex way of creating the output file name as it combines the chosen session and the source path 
+        // Allows passing in an unknown session name !!
+        private string createOutputFileName(string outputFileName, string? session_name)
         {
-            return System.IO.Path.GetDirectoryName(outputFileName) +"\\output1.kml";
+            string lPath = System.IO.Path.GetDirectoryName(outputFileName);
+            lPath += (null == session_name) ? "\\output1" : "\\" + session_name;
+            lPath += ".kml";
+            return lPath;
         }
 
         // Create the OnPropertyChanged method to raise the event
@@ -109,6 +124,12 @@ namespace DisplayBixlerPath
             if (!string.IsNullOrEmpty(selectedSession))
             {
                 _selectedSession = selectedSession;
+                if (!selectedSession.Contains("All Session"))
+                {
+                    _selectedSession = selectedSession;//jgs
+                    string[] fields = _selectedSession.Split(' ');
+                    _CurrentlySelectedSession = Convert.ToUInt16(fields[1]);// assumes format JGS 
+                }
             }
             else
             {

@@ -9,18 +9,20 @@
 
 
         <DockPanel Margin="10">
-            <WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Top" Margin="0,0,0,10">
+          <WrapPanel HorizontalAlignment="Center" DockPanel.Dock="Top" Margin="0,0,0,10">
             <Button Margin="10" Name="btnOpenFile" Click="btnOpenFile_Click">Open file</Button>
             <Separator Width="20" Background="Transparent"/>
-            <Button Margin="10" Name="btnExtractRoute" Click="btnExtractRoute_Click">Extract Route</Button>
+            <Button Margin="10" Name="btnExtractRoute" Click="btnExtractRoute_Click" IsEnabled="False" >Extract Route</Button>
             <Separator Width="20" Background="Transparent"/>
-              <ComboBox Name="cmbSessions" SelectionChanged="cmbSessions_SelectionChanged" ItemsSource="{Binding _names}">
-            
-              </ComboBox>
-            </WrapPanel>
-            <TextBox Name="txtEditor" />
+            <ComboBox Name="cmbSessions" SelectionChanged="cmbSessions_SelectionChanged"
+                      ItemsSource="{Binding _names}" Width="100" Height="20" 
+                      VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,10,0,0">
+
+            </ComboBox>
+          </WrapPanel>
+       
         </DockPanel>
 
-   
+
 
 </Window>

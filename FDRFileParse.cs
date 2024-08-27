@@ -14,28 +14,22 @@ namespace DisplayBixlerPath
     public class FDRFileParse
     {
         List<ReadingPoint> ReadingPointList = new List<ReadingPoint>();
-        List<SessionIdentifier> _SessionIdentifierList = new List<SessionIdentifier>();
+        ActiveSessionIdentifier? _activeSessionIdentifier = null;
         ReadingPointHeader? readingPointHeader;// in reality JGS we should not make this alowable to null
 
+        /// Constructor 
         public FDRFileParse(string[] lines)
         {
+            _activeSessionIdentifier = new ActiveSessionIdentifier();
             readActionOnFDRFile(lines);
         }
 
-        public List<SessionIdentifier> SessionIdentifierList
-        {   
-            get => _SessionIdentifierList;
-        }
 
         public ObservableCollection<string> SessionNames()
-        {   
-            ObservableCollection<string> s= new ObservableCollection<string>();
-            foreach (SessionIdentifier sessionIdentifier in _SessionIdentifierList )
-            {
-                s.Add(sessionIdentifier.SessionName);
-            }
-            return s;
+        {
+            return _activeSessionIdentifier.SessionNames();
         }
+
 
         /// need to account for the first two lines JGS 
         private void readActionOnFDRFile(string[] lines)
@@ -46,7 +40,7 @@ namespace DisplayBixlerPath
                 {   // the lines starting with session are a part of a pair
                     // where the second line is the start and stop index 
                     // And the first line is the name of the session 
-                    _SessionIdentifierList.Add(new SessionIdentifier(lines[i], lines[i + 1]));
+                    _activeSessionIdentifier.AddWSession(lines[i], lines[i + 1]);
                     i++; // we have read a second line so increment the counter to account for that 
                 }
                 else if (lines[i].StartsWith("Milliseconds"))
@@ -54,38 +48,44 @@ namespace DisplayBixlerPath
                     readingPointHeader = new ReadingPointHeader(lines[i]);
                 }
                 else
-                {   // The reading points - they are 29 entries of strings representing the values of the measured components 
-                    // They dont always exist in pairs but they can be read two at a time - so check for the 
-                    ReadingPointList.Add(new ReadingPoint(lines[i]));
+                {
+                    UInt16 _sessionId = _activeSessionIdentifier.givenLineReturnSessionID(i); // i is not the right variable yet 
+                    ReadingPoint rp = new ReadingPoint(_sessionId, lines[i]);
+                    
+                    ReadingPointList.Add(rp);
+                    // ReadingPoint ReadingPointLast = ReadingPointList.Last();
                 }
             }
-            ReadingPoint ReadingPointLast = ReadingPointList.Last();
-        }
-
-        public bool ExtractKMLCoordinates(SessionIdentifier sessionIdentifier)
-        {
-
-            return true;
         }
 
 
         /// Function extracts just the coordinates from each reading point in the file
-        public List<CoordinateTriple> ExtractKMLPathGivenSession()
+        public List<CoordinateTriple> ExtractKMLPathGivenSession(UInt16 sessionID)
         {
-            List < CoordinateTriple > _listCoordTriple = new List<CoordinateTriple> ();
+            List<CoordinateTriple> _listCoordTriple = new List<CoordinateTriple>();
 
-            foreach (ReadingPoint var in ReadingPointList)
+            if (0 == sessionID)
             {
-                /// while switch is on  
-
-                CoordinateTriple cordTripple = new CoordinateTriple(var,26,25,27);// jgs magic numbers 
-                _listCoordTriple.Add(cordTripple);
+                _listCoordTriple = ExtractAllKMLPath();
+            }
+            else
+            {
+                foreach (ReadingPoint var in ReadingPointList)
+                {
+                    if (var.SessionIndex == sessionID)
+                    {
+                        CoordinateTriple cordTripple = new CoordinateTriple(var, 26, 25, 11);// jgs magic numbers To Eradicate 
+                        _listCoordTriple.Add(cordTripple);
+                    }
+                }
             }
 
             return _listCoordTriple;
         }
 
-         /// Function extracts just the coordinates from each reading point in the file
+        /// Function extracts just the coordinates from each reading point in the file
+        /// There is no distinction in the different sessions here 
+        /// this needs to go - its just for testing 
         public List<CoordinateTriple> ExtractAllKMLPath()
         {
             List < CoordinateTriple > _listCoordTriple = new List<CoordinateTriple> ();
